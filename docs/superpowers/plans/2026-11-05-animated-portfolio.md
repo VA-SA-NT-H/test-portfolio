@@ -2001,3 +2001,15 @@ Expected: all three PASS in one go
 - **Type consistency:** `Reveal({ children, delay?, className? })`, `useCountUp(target, duration?) → { ref, value }`, `usePrefersReducedMotion(): boolean`, `Project = (typeof projects)[number]` — used identically in every task.
 - **Placeholders:** none; every step carries runnable code or exact commands.
 
+
+---
+
+# Redesign: Digital Engineering Laboratory (ui-taste)
+
+Direction contract (development-only):
+- Thesis: portfolio as an engineer's live instrument bench; every section its own asymmetric composition — no identical card grids, no centered hero.
+- Palette roles: ground #070B18 / panels #0E1526 / charcoal #0A0D16; electric blue #4C7DFF = interaction accent (CTAs, focus, active nav); cyan #35D6E8 = data & signal (metrics, photons, diagram); violet #8B5CF6 = atmosphere only (glows, never text/controls); cool grey family #8A93AD. Amber/teal retired.
+- Type: Space Grotesk display / Inter body / IBM Plex Mono only for tech tags + metric values.
+- Signature: fine technical grid + violet atmospheric glow; cursor-reactive nodal hero visualization; scroll-linked active nav indicator.
+- Authority: Replace (user-approved redesign). Product truth, data/*.ts, links, and the 30-test contract preserved; no résumé or live-demo links invented.
+- Finish: typecheck + tests + build green; browser captures at 375/768/1440 compared to generated target; reduced-motion + keyboard checks.

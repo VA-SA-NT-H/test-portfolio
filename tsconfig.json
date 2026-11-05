@@ -13,7 +13,7 @@
     "skipLibCheck": true,
     "isolatedModules": true,
     "noEmit": true,
-    "types": ["node", "vitest/globals", "@testing-library/jest-dom"]
+    "types": ["node"]
   },
   "include": ["src", "data", "vite.config.ts"]
 }
