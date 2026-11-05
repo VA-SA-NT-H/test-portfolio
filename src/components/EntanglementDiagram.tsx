@@ -61,13 +61,14 @@ export function EntanglementDiagram({ className = "" }: { className?: string }) 
         <circle cx="620" cy="200" r="14" className="fill-accent" />
         <circle cx="180" cy="200" r="26" className="stroke-accent/30" strokeWidth="1" />
         <circle cx="620" cy="200" r="26" className="stroke-accent/30" strokeWidth="1" />
-        {/* Traveling photons */}
+        {/* Traveling photons — negative begin keeps them moving from frame one
+            instead of flashing at the SVG origin before their cycle starts */}
         {!reduced &&
           photons.map((index) => (
             <circle key={index} r="5" className="fill-signal">
               <animateMotion
                 dur={`${3 + index * 0.6}s`}
-                begin={`${index * 0.9}s`}
+                begin={`${-index * 0.9}s`}
                 repeatCount="indefinite"
               >
                 <mpath href={`#photon-${index + 1}`} />

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { About } from "./components/About";
 import { Contact } from "./components/Contact";
 import { Craft } from "./components/Craft";
@@ -8,6 +9,14 @@ import { Research } from "./components/Research";
 import { Work } from "./components/Work";
 
 export default function App() {
+  // Deep links (#work, #research, …) arrive before React mounts, so the
+  // browser's own fragment scroll finds nothing — honor the hash once rendered.
+  useEffect(() => {
+    const target = window.location.hash.slice(1);
+    if (!target) return;
+    document.getElementById(target)?.scrollIntoView();
+  }, []);
+
   return (
     <div className="min-h-svh bg-void font-body text-ink antialiased">
       <a

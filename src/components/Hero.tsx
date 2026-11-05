@@ -30,7 +30,7 @@ export function Hero() {
       <div aria-hidden="true" className="glow-field pointer-events-none absolute inset-0" />
 
       {/* Signature visual: bleeds off the right edge, sits behind content */}
-      <EntanglementDiagram className="absolute inset-y-0 right-0 h-full w-full text-signal opacity-50 sm:w-[70%] sm:opacity-80" />
+      <EntanglementDiagram className="absolute inset-y-0 right-0 h-full w-full text-signal opacity-30 sm:w-[55%] sm:opacity-80" />
 
       <motion.div
         className="relative z-10 mx-auto w-full max-w-6xl px-4 py-24 sm:px-6"

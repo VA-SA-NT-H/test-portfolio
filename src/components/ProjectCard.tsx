@@ -52,7 +52,7 @@ export function ProjectCard({ project, featured = false }: ProjectCardProps) {
       </ul>
 
       <dl
-        className={`grid grid-cols-3 gap-4 border-t border-white/10 pt-4 ${
+        className={`grid grid-cols-1 gap-3 border-t border-white/10 pt-4 sm:grid-cols-3 sm:gap-4 ${
           featured ? "mt-8" : "mt-5"
         }`}
       >
