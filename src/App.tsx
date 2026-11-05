@@ -1,3 +1,4 @@
+import { Contact } from "./components/Contact";
 import { Craft } from "./components/Craft";
 import { Header } from "./components/Header";
 import { Hero } from "./components/Hero";
@@ -8,13 +9,20 @@ import { Work } from "./components/Work";
 export default function App() {
   return (
     <div className="min-h-svh bg-void font-body text-ink antialiased">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:bg-measure focus:px-4 focus:py-2 focus:text-void"
+      >
+        Skip to content
+      </a>
       <Header />
-      <main>
+      <main id="main">
         <Hero />
         <Work />
         <Research />
         <Path />
         <Craft />
+        <Contact />
       </main>
     </div>
   );
