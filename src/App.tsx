@@ -1,3 +1,4 @@
+import { Craft } from "./components/Craft";
 import { Header } from "./components/Header";
 import { Hero } from "./components/Hero";
 import { Path } from "./components/Path";
@@ -13,6 +14,7 @@ export default function App() {
         <Work />
         <Research />
         <Path />
+        <Craft />
       </main>
     </div>
   );
