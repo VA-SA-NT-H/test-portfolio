@@ -4,6 +4,11 @@ import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 
 const photons = [0, 1, 2];
 
+/**
+ * The hero's interactive visualization: two entangled nodes exchanging
+ * photons along three paths. Drifts toward the cursor on a spring;
+ * freezes entirely under prefers-reduced-motion.
+ */
 export function EntanglementDiagram({ className = "" }: { className?: string }) {
   const reduced = usePrefersReducedMotion();
   const svgRef = useRef<SVGSVGElement>(null);
@@ -33,29 +38,33 @@ export function EntanglementDiagram({ className = "" }: { className?: string }) 
           id="photon-1"
           d="M180 200 C 320 80, 480 80, 620 200"
           stroke="currentColor"
-          className="stroke-entangle/30"
+          className="stroke-signal/40"
           strokeWidth="1.5"
         />
         <path
           id="photon-2"
           d="M180 200 C 320 320, 480 320, 620 200"
           stroke="currentColor"
-          className="stroke-entangle/30"
+          className="stroke-signal/40"
           strokeWidth="1.5"
         />
         <path
           id="photon-3"
           d="M180 200 C 360 200, 440 200, 620 200"
           stroke="currentColor"
-          className="stroke-entangle/20"
+          className="stroke-accent/30"
           strokeWidth="1.5"
           strokeDasharray="4 8"
         />
-        <circle cx="180" cy="200" r="14" className="fill-entangle" />
-        <circle cx="620" cy="200" r="14" className="fill-entangle" />
+        {/* Measurement nodes */}
+        <circle cx="180" cy="200" r="14" className="fill-accent" />
+        <circle cx="620" cy="200" r="14" className="fill-accent" />
+        <circle cx="180" cy="200" r="26" className="stroke-accent/30" strokeWidth="1" />
+        <circle cx="620" cy="200" r="26" className="stroke-accent/30" strokeWidth="1" />
+        {/* Traveling photons */}
         {!reduced &&
           photons.map((index) => (
-            <circle key={index} r="5" className="fill-measure">
+            <circle key={index} r="5" className="fill-signal">
               <animateMotion
                 dur={`${3 + index * 0.6}s`}
                 begin={`${index * 0.9}s`}
