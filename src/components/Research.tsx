@@ -1,57 +1,114 @@
+import { motion, useScroll, useTransform } from "motion/react";
+import { useRef } from "react";
 import { experience } from "../../data/experience";
+import { staggerGroup, staggerItem, VIEWPORT } from "../motion/presets";
+import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import { Reveal } from "./Reveal";
+import { SectionHead } from "./SectionHead";
 import { Stat } from "./Stat";
 
 /**
- * The only light-inverted section — research presented the way a paper
- * would: role, standards, metrics. Count-up achievements in a side column.
+ * The one acid-lime surface in the site: research presented the way a
+ * poster would — role, numbered findings, and the achievements as
+ * oversized numerals against the colour field.
  */
 export function Research() {
+  const reduced = usePrefersReducedMotion();
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const formulaY = useTransform(scrollYProgress, [0, 1], [-48, 48]);
+
   return (
-    <section id="research" aria-labelledby="research-heading" className="bg-paper text-night">
-      <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-        <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr] lg:items-end">
-          <Reveal>
-            <h2 id="research-heading" className="font-display text-3xl font-semibold sm:text-4xl">
-              Research
-            </h2>
-          </Reveal>
-          <Reveal delay={0.05}>
-            <p className="max-w-2xl text-night/70">
-              Quantum-secure image encryption, evaluated the way a paper would be: standards,
-              metrics, and comparisons.
-            </p>
-          </Reveal>
-        </div>
+    <section
+      id="research"
+      ref={sectionRef}
+      aria-labelledby="research-heading"
+      className="surface-lime relative overflow-hidden border-b-2 border-ink bg-lime py-20 text-ink md:py-28"
+    >
+      {/* Decorative formula, bleeding off the bottom edge */}
+      <motion.span
+        aria-hidden="true"
+        style={reduced ? undefined : { y: formulaY }}
+        className="outline-ink pointer-events-none absolute -bottom-[10%] right-[-3%] hidden select-none font-display text-[28vw] leading-none tracking-tighter opacity-20 lg:block"
+      >
+        E91
+      </motion.span>
 
-        <div className="mt-12 grid gap-12 lg:grid-cols-[1.6fr_1fr]">
-          <Reveal>
-            <h3 className="font-display text-2xl font-semibold">{experience.role}</h3>
-            <p className="mt-1 text-night/70">
-              {experience.organization} · {experience.duration}
-            </p>
-            <ul className="mt-6 space-y-3">
-              {experience.highlights.map((highlight) => (
-                <li key={highlight} className="flex gap-3 text-sm leading-relaxed">
-                  <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 shrink-0 bg-night" />
-                  <span>{highlight}</span>
-                </li>
-              ))}
-            </ul>
-          </Reveal>
+      <div className="shell relative z-10">
+        <SectionHead
+          index="03"
+          kicker="Published research"
+          title="Research"
+          meta={experience.duration}
+          headingId="research-heading"
+        />
 
-          <Reveal delay={0.1}>
-            <div className="space-y-6">
-              {experience.achievements.map((achievement) => (
-                <div
-                  key={achievement.label}
-                  className="border-t border-night/15 pt-5 first:border-t-0 first:pt-0"
+        <div className="mt-12 grid gap-12 lg:grid-cols-12 lg:gap-14">
+          {/* Findings */}
+          <div className="lg:col-span-7">
+            <Reveal>
+              <h3 className="font-display text-[clamp(1.4rem,3vw,2.5rem)] uppercase leading-[1.05] tracking-[-0.02em]">
+                {experience.role}
+              </h3>
+              <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.18em] text-ink/75">
+                {experience.organization} · {experience.duration}
+              </p>
+            </Reveal>
+
+            <motion.ol
+              variants={staggerGroup(0.07, 0.05)}
+              initial="hidden"
+              whileInView="show"
+              viewport={VIEWPORT}
+              className="mt-9 border-t-2 border-ink"
+            >
+              {experience.highlights.map((highlight, index) => (
+                <motion.li
+                  key={highlight}
+                  variants={staggerItem}
+                  className="flex gap-4 border-b border-ink/40 px-2 py-4 transition-colors duration-300 hover:bg-ink hover:text-lime sm:gap-6"
                 >
-                  <Stat value={achievement.value} label={achievement.label} tone="dark" />
-                </div>
+                  <span className="font-mono text-[11px] leading-6 tracking-[0.14em]">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className="font-grotesk text-base leading-6 sm:text-lg sm:leading-7">
+                    {highlight}
+                  </span>
+                </motion.li>
               ))}
-            </div>
-          </Reveal>
+            </motion.ol>
+          </div>
+
+          {/* Achievements */}
+          <div className="lg:col-span-5">
+            <motion.div
+              variants={staggerGroup(0.1, 0.1)}
+              initial="hidden"
+              whileInView="show"
+              viewport={VIEWPORT}
+              className="flex flex-col gap-8"
+            >
+              {experience.achievements.map((achievement) => (
+                <motion.div
+                  key={achievement.label}
+                  variants={staggerItem}
+                  className="border-t-2 border-ink pt-6"
+                >
+                  <Stat value={achievement.value} label={achievement.label} tone="ink" />
+                </motion.div>
+              ))}
+            </motion.div>
+
+            <Reveal delay={0.16}>
+              <p className="mt-10 border-t-2 border-ink pt-5 font-mono text-[11px] uppercase leading-relaxed tracking-[0.16em] text-ink/75">
+                Evaluated on Entropy, NPCR, UACI, PSNR, MSE and MAE — E91+Chaos compared against
+                BB84+Chaos.
+              </p>
+            </Reveal>
+          </div>
         </div>
       </div>
     </section>

@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 
 /**
  * Scroll spy: reports which of the given section ids is currently in the
- * reading zone. Drives the active indicator in the header nav.
+ * reading zone, or null while the hero (#top) is — so the nav indicator
+ * fades out instead of sticking to the last section after scrolling home.
  */
 export function useActiveSection(ids: readonly string[]): string | null {
   const [active, setActive] = useState<string | null>(null);
@@ -16,13 +17,17 @@ export function useActiveSection(ids: readonly string[]): string | null {
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) setActive(entry.target.id);
+          if (!entry.isIntersecting) continue;
+          setActive(entry.target.id === "top" ? null : entry.target.id);
         }
       },
       { rootMargin: "-40% 0px -55% 0px", threshold: 0 },
     );
 
     for (const section of sections) observer.observe(section);
+    const hero = document.getElementById("top");
+    if (hero) observer.observe(hero);
+
     return () => observer.disconnect();
   }, [ids]);
 

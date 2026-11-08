@@ -17,6 +17,14 @@ export const portfolio = {
     "Tamil Nadu, India",
 };
 
+/** The four disciplines that anchor the hero composition. */
+export const disciplines = [
+  "Java Full Stack Developer",
+  "Backend Engineering",
+  "Software Automation",
+  "System Architecture"
+];
+
 export interface TimelineEntry {
   start: string;
   end: string | null;
@@ -53,9 +61,13 @@ export const timeline: TimelineEntry[] = [
   }
 ];
 
+/**
+ * The technical index. Reorganised into the portfolio's category system —
+ * every skill from the original grouping is preserved exactly once.
+ */
 export const skillGroups = [
   {
-    title: "Programming",
+    title: "Programming Languages",
 
     skills: [
       "Java",
@@ -67,21 +79,28 @@ export const skillGroups = [
   },
 
   {
-    title: "Backend",
+    title: "Frontend Engineering",
+
+    skills: [
+      "React",
+      "Next JS"
+    ]
+  },
+
+  {
+    title: "Backend Engineering",
 
     skills: [
       "FastAPI",
       "Django",
-      "React",
-      "Next JS",
-      "Spring Boot",    
+      "Spring Boot",
       "Hibernate",
       "REST APIs"
     ]
   },
 
   {
-    title: "Databases",
+    title: "Database Systems",
 
     skills: [
       "MySQL",
@@ -93,20 +112,25 @@ export const skillGroups = [
   },
 
   {
-    title: "DevOps",
+    title: "Cloud & DevOps",
 
     skills: [
-      "Docker",
-      "Git",
-      "GitHub",
-      "Linux",
       "AWS",
-      "CI/CD"
+      "Docker"
     ]
   },
 
   {
-    title: "AI & ML",
+    title: "Automation",
+
+    skills: [
+      "CI/CD",
+      "GitHub Actions"
+    ]
+  },
+
+  {
+    title: "AI & Machine Learning",
 
     skills: [
       "OpenCV",
@@ -117,7 +141,17 @@ export const skillGroups = [
   },
 
   {
-    title: "Security",
+    title: "Engineering Tools",
+
+    skills: [
+      "Git",
+      "GitHub",
+      "Linux"
+    ]
+  },
+
+  {
+    title: "Security & Cryptography",
 
     skills: [
       "AES-256",

@@ -1,66 +1,135 @@
+import { motion } from "motion/react";
 import { timeline } from "../../data/portfolio";
+import { DUR, EASE_OUT, VIEWPORT } from "../motion/presets";
+import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import { Reveal } from "./Reveal";
+import { SectionHead } from "./SectionHead";
+
+/** "2022-11" → "2022" */
+const yearOf = (iso: string) => iso.slice(0, 4);
 
 /**
- * Chronological storytelling: sticky editorial heading beside a
- * scroll-revealed timeline; the current role is marked in signal cyan.
+ * The record as a bold editorial timeline: oversized years, a drawn
+ * connecting rule, alternating offsets, and the current role flagged
+ * in signal orange.
  */
 export function Path() {
+  const reduced = usePrefersReducedMotion();
+
   return (
     <section
       id="path"
       aria-labelledby="path-heading"
-      className="mx-auto max-w-6xl px-4 py-24 sm:px-6"
+      className="surface-ink relative overflow-hidden border-b-2 border-ink bg-ink py-20 text-paper md:py-28"
     >
-      <div className="grid gap-10 lg:grid-cols-[1fr_2fr] lg:gap-16">
-        <div className="lg:sticky lg:top-24 lg:self-start">
-          <Reveal>
-            <h2 id="path-heading" className="font-display text-3xl font-semibold sm:text-4xl">
-              Path
-            </h2>
-            <p className="mt-2 max-w-xs text-muted">
-              Education, research, and the role I am in now.
-            </p>
-          </Reveal>
+      <div className="shell relative z-10">
+        <SectionHead
+          index="04"
+          kicker="Chronology"
+          title="Path"
+          meta={`${timeline.length} entries`}
+          headingId="path-heading"
+        />
+
+        <div className="mt-12 flex items-baseline justify-between gap-6 border-b border-paper/25 pb-4 font-mono text-[10px] uppercase tracking-[0.24em] text-concrete sm:text-[11px]">
+          <span>Education · Research · Role</span>
+          <span className="hidden sm:inline">2022 — Present</span>
         </div>
 
-        <ol className="border-l border-white/10 pl-6 sm:pl-8">
-          {timeline.map((entry) => {
+        <ol className="relative">
+          {/* Drawn spine — the observer sits on the static wrapper:
+              a scaleY(0) target has zero area, so it never reports
+              intersecting and whileInView would never fire. */}
+          {reduced ? (
+            <span
+              aria-hidden="true"
+              className="absolute bottom-0 left-2 top-0 hidden w-px bg-paper/30 sm:block"
+            />
+          ) : (
+            <motion.span
+              aria-hidden="true"
+              className="absolute bottom-0 left-2 top-0 hidden sm:block"
+              initial="hidden"
+              whileInView="show"
+              viewport={VIEWPORT}
+              variants={{ hidden: {}, show: {} }}
+            >
+              <motion.span
+                className="block h-full w-px origin-top bg-paper/30"
+                variants={{ hidden: { scaleY: 0 }, show: { scaleY: 1 } }}
+                transition={{ duration: DUR.draw, ease: EASE_OUT }}
+              />
+            </motion.span>
+          )}
+
+          {timeline.map((entry, index) => {
             const current = entry.end === null;
+            const years = current
+              ? `${yearOf(entry.start)} — Now`
+              : `${yearOf(entry.start)} — ${yearOf(entry.end!)}`;
+
             return (
-              <li key={entry.start} className="relative pb-10 last:pb-0">
+              <li
+                key={entry.start}
+                className={`relative border-b border-paper/25 py-9 pl-7 sm:pl-10 ${
+                  index % 2 === 1 ? "lg:pl-16" : ""
+                }`}
+              >
+                {/* Node */}
                 <span
                   aria-hidden="true"
-                  className={`absolute -left-[31px] top-1.5 h-3 w-3 rounded-full border-2 ${
-                    current
-                      ? "border-signal bg-signal shadow-[0_0_12px_rgba(53,214,232,0.6)]"
-                      : "border-accent bg-void"
+                  className={`absolute left-0 top-11 hidden h-4 w-4 border-2 sm:block ${
+                    current ? "border-orange bg-orange" : "border-paper bg-ink"
                   }`}
                 />
-                <Reveal>
-                  <p className="text-sm text-muted">{entry.period}</p>
-                  <h3 className="mt-1 font-display text-xl font-semibold">
-                    {entry.title}
-                    {current && (
-                      <span className="ml-2 align-middle border border-signal px-2 py-0.5 text-xs font-medium text-signal">
-                        Present
+                <span
+                  aria-hidden="true"
+                  className={`absolute left-0 top-11 h-3 w-3 sm:hidden ${
+                    current ? "bg-orange" : "bg-paper"
+                  }`}
+                />
+
+                <Reveal delay={Math.min(index * 0.07, 0.28)}>
+                  <div className="grid gap-4 lg:grid-cols-12 lg:items-baseline lg:gap-8">
+                    {/* Date typography */}
+                    <div className="lg:col-span-5">
+                      <span className="block font-display text-[clamp(2.1rem,6vw,4.75rem)] leading-[0.9] tracking-[-0.035em]">
+                        {years}
                       </span>
-                    )}
-                  </h3>
-                  <p className="mt-1 text-sm text-muted">
-                    {entry.link ? (
-                      <a
-                        href={entry.link}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="underline-offset-4 transition-colors hover:text-accent hover:underline"
-                      >
-                        {entry.organization}
-                      </a>
-                    ) : (
-                      entry.organization
-                    )}
-                  </p>
+                      <span className="mt-3 flex flex-wrap items-center gap-3 font-mono text-[11px] uppercase tracking-[0.18em] text-concrete">
+                        {entry.period}
+                        {current && (
+                          <span className="border border-orange bg-orange px-2 py-0.5 text-ink">
+                            Present
+                          </span>
+                        )}
+                      </span>
+                    </div>
+
+                    {/* Role */}
+                    <div className="lg:col-span-7">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-lime">
+                        {String(index + 1).padStart(2, "0")} / Entry
+                      </span>
+                      <h3 className="mt-2 font-grotesk text-xl font-semibold leading-tight text-paper sm:text-2xl">
+                        {entry.title}
+                      </h3>
+                      <p className="mt-2 font-mono text-[12px] uppercase tracking-[0.14em] text-concrete">
+                        {entry.link ? (
+                          <a
+                            href={entry.link}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="underline decoration-orange decoration-2 underline-offset-4 transition-colors hover:text-lime"
+                          >
+                            {entry.organization} ↗
+                          </a>
+                        ) : (
+                          entry.organization
+                        )}
+                      </p>
+                    </div>
+                  </div>
                 </Reveal>
               </li>
             );
