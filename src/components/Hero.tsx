@@ -1,4 +1,4 @@
-import { motion, useMotionTemplate, useMotionValue, useScroll, useTransform, type Variants } from "motion/react";
+import { motion, useMotionTemplate, useMotionValue, useScroll, useSpring, useTransform, type Variants } from "motion/react";
 import { useEffect, useRef } from "react";
 import { disciplines, portfolio } from "../../data/portfolio";
 import { GITHUB } from "../links";
@@ -88,6 +88,18 @@ export function Hero() {
   );
   const coordLabel = useMotionTemplate`POS ${coordX} · ${coordY}`;
 
+  /* ── Spatial layer ────────────────────────────────────────
+     One spring-driven tilt for the whole decorative plane. Each
+     layer's depth is a static translateZ, so parallax between the
+     grid, the shapes and the annotations falls out of that single
+     transform — no per-layer JavaScript. */
+  const pointerX = useMotionValue(0);
+  const pointerY = useMotionValue(0);
+  const springTiltX = useSpring(pointerX, { stiffness: 55, damping: 18, mass: 0.7 });
+  const springTiltY = useSpring(pointerY, { stiffness: 55, damping: 18, mass: 0.7 });
+  const rotateY = useTransform(springTiltX, [-1, 1], [-3.2, 3.2]);
+  const rotateX = useTransform(springTiltY, [-1, 1], [2.4, -2.4]);
+
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -105,8 +117,18 @@ export function Hero() {
 
     const handle = (event: PointerEvent) => {
       if (!onScreen) return;
-      mx.set(event.clientX - rect.left);
-      my.set(event.clientY - rect.top);
+
+      const localX = event.clientX - rect.left;
+      const localY = event.clientY - rect.top;
+      mx.set(localX);
+      my.set(localY);
+
+      /* Tilt only when motion is welcome; under reduced motion the
+         springs are never written to and the plane stays flat. */
+      if (!reduced && rect.width > 0 && rect.height > 0) {
+        pointerX.set((localX / rect.width - 0.5) * 2);
+        pointerY.set((localY / rect.height - 0.5) * 2);
+      }
     };
 
     window.addEventListener("pointermove", handle, { passive: true });
@@ -117,7 +139,7 @@ export function Hero() {
       window.removeEventListener("scroll", measure);
       window.removeEventListener("resize", measure);
     };
-  }, [mx, my]);
+  }, [mx, my, pointerX, pointerY, reduced]);
 
   /* Hand-off: shapes lag, the figure tilts, the highlight bar grows. */
   const { scrollYProgress } = useScroll({
@@ -140,22 +162,62 @@ export function Hero() {
       aria-labelledby="hero-title"
       className="relative isolate overflow-hidden border-b-2 border-ink bg-paper pt-14 md:pt-16"
     >
-      {/* Drafting sheet */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-        <div className="drafting-grid" />
-      </div>
+      {/* ── Spatial layer ────────────────────────────────────
+          One perspective container, one tilted plane inside it.
+          Depth is translateZ per layer; the drafting grid sits
+          behind (−140px), the counterweights lift forward, and the
+          annotations float between them. Copy never enters this
+          layer, so type stays flat, sharp and readable. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+        style={{ perspective: "1400px", perspectiveOrigin: "50% 44%" }}
+      >
+        <motion.div
+          style={reduced ? undefined : { rotateX, rotateY }}
+          className="absolute inset-0 [transform-style:preserve-3d] will-change-transform"
+        >
+          {/* Drafting sheet, pushed back so the tilt reads as depth */}
+          <div className="absolute inset-0" style={{ transform: "translateZ(-140px)" }}>
+            <div className="drafting-grid" />
+          </div>
 
-      {/* Geometric counterweights — parallax on scroll only */}
-      <motion.div
-        aria-hidden="true"
-        style={reduced ? undefined : { y: shapeY }}
-        className="pointer-events-none absolute right-[-8%] top-[16%] z-0 hidden h-[24vw] w-[24vw] max-h-96 max-w-96 bg-blue md:block"
-      />
-      <motion.div
-        aria-hidden="true"
-        style={reduced ? undefined : { y: shapeY }}
-        className="pointer-events-none absolute bottom-[22%] right-[6%] z-0 hidden h-[9vw] w-[9vw] max-h-36 max-w-36 rounded-full bg-orange lg:block"
-      />
+          {/* Geometric counterweights — scroll parallax, lifted in Z */}
+          <motion.div
+            style={reduced ? { z: 60 } : { y: shapeY, z: 60 }}
+            className="absolute right-[-8%] top-[16%] hidden h-[24vw] w-[24vw] max-h-96 max-w-96 bg-blue md:block"
+          />
+          <motion.div
+            style={reduced ? { z: 30 } : { y: shapeY, z: 30 }}
+            className="absolute bottom-[22%] right-[6%] hidden h-[9vw] w-[9vw] max-h-36 max-w-36 rounded-full bg-orange lg:block"
+          />
+
+          {/* Floating technical annotations — sheet marginalia */}
+          <div className="absolute left-1 top-[12%] hidden xl:block" style={{ transform: "translateZ(56px)" }}>
+            <span className="block font-mono text-[10px] uppercase tracking-[0.34em] text-slate [writing-mode:vertical-rl]">
+              Scale 1:1
+            </span>
+            <span aria-hidden="true" className="mt-2 block h-16 w-px bg-ink/30" />
+          </div>
+
+          <div className="absolute right-1 top-[58%] hidden xl:block" style={{ transform: "translateZ(72px)" }}>
+            <span className="block font-mono text-[10px] uppercase tracking-[0.34em] text-slate [writing-mode:vertical-rl]">
+              Tol ±0.02
+            </span>
+            <span aria-hidden="true" className="mt-2 block h-16 w-px bg-ink/30" />
+          </div>
+
+          <div
+            className="absolute bottom-[calc(22%_+_11vw)] right-[6%] hidden lg:block"
+            style={{ transform: "translateZ(48px)" }}
+          >
+            <span aria-hidden="true" className="block h-px w-16 bg-ink/40" />
+            <span className="mt-1.5 block font-mono text-[10px] uppercase tracking-[0.24em] text-slate">
+              Mat. ink / paper
+            </span>
+          </div>
+        </motion.div>
+      </div>
 
       {/* Technical metadata strip */}
       <div className="relative z-10 border-b border-ink/30">

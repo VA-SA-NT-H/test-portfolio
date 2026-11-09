@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
-import { DUR, EASE_OUT } from "../../motion/presets";
+import { DUR, EASE_OUT, VIEWPORT } from "../../motion/presets";
 import type { Project } from "./types";
 
 /* ── Shared parts of every case study ────────────────────────
@@ -97,9 +97,23 @@ export function Metrics({
             : "text-ink"
         : ACCENT_TEXT[accent];
   return (
-    <dl className={`grid grid-cols-3 gap-4 border-t-2 ${rule} pt-5 ${className}`}>
+    /* Results arrive one metric after the story, left → right —
+       sequencing the eye across the three numbers. */
+    <motion.dl
+      variants={{ hidden: {}, show: { transition: { staggerChildren: 0.12 } } }}
+      initial="hidden"
+      whileInView="show"
+      viewport={VIEWPORT}
+      className={`grid grid-cols-3 gap-4 border-t-2 ${rule} pt-5 ${className}`}
+    >
       {metrics.map((metric) => (
-        <div key={metric.label}>
+        <motion.div
+          key={metric.label}
+          variants={{
+            hidden: { opacity: 0, y: 14 },
+            show: { opacity: 1, y: 0, transition: { duration: DUR.base, ease: EASE_OUT } },
+          }}
+        >
           <dt className={`font-mono text-[10px] uppercase tracking-[0.2em] ${label}`}>
             {metric.label}
           </dt>
@@ -108,9 +122,9 @@ export function Metrics({
           >
             {metric.value}
           </dd>
-        </div>
+        </motion.div>
       ))}
-    </dl>
+    </motion.dl>
   );
 }
 
@@ -252,7 +266,17 @@ export function VisualCaption({
         <span aria-hidden="true" className={`inline-block h-2 w-2 ${ACCENT_BG[accent]}`} />
         {label}
       </span>
-      {note && <span className={text}>{note}</span>}
+      {/* On ink the flow note lights up with the panel hover — the
+          diagram's direction of travel answers the pointer. */}
+      {note && (
+        <span
+          className={`${text}${
+            tone === "ink" ? " transition-colors duration-300 group-hover:text-lime" : ""
+          }`}
+        >
+          {note}
+        </span>
+      )}
     </div>
   );
 }

@@ -211,6 +211,14 @@
   .rail-marker {
     animation: rail-walk 3.6s linear infinite;
   }
+
+  /* Spatial index canvas: vertical drags belong to the page, only
+     horizontal movement rotates the lattice. */
+  .spatial-surface canvas {
+    touch-action: pan-y;
+    cursor: crosshair;
+    display: block;
+  }
 }
 
 @keyframes grid-drift {

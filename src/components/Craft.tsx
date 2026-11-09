@@ -2,9 +2,11 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import { certifications } from "../../data/certifications";
 import { skillGroups } from "../../data/portfolio";
+import { skillProjects } from "../scene/latticeGraph";
 import { staggerGroup, staggerItem, VIEWPORT } from "../motion/presets";
 import { Reveal } from "./Reveal";
 import { SectionHead } from "./SectionHead";
+import { SpatialIndexPanel } from "../scene/SpatialIndexPanel";
 
 const technologyCount = skillGroups.reduce((total, group) => total + group.skills.length, 0);
 
@@ -31,6 +33,9 @@ export function Craft() {
           meta={`${technologyCount} entries`}
           headingId="craft-heading"
         />
+
+        {/* The one WebGL moment: hovering a row below lights its cluster */}
+        <SpatialIndexPanel activeGroup={hovered} />
 
         <motion.div
           variants={staggerGroup(0.09)}
@@ -63,18 +68,27 @@ export function Craft() {
                   </span>
                 </div>
 
-                {/* Technologies */}
+                {/* Technologies — hovering one shows how many case
+                    studies actually use it */}
                 <ul className="flex flex-wrap items-baseline gap-x-6 gap-y-2 lg:col-span-8">
-                  {group.skills.map((skill) => (
-                    <li key={skill}>
-                      <span
-                        data-cursor
-                        className="inline-block cursor-default px-1 font-grotesk text-[clamp(1.2rem,2.8vw,2.4rem)] font-medium uppercase leading-tight tracking-[-0.02em] transition-colors duration-200 hover:bg-ink hover:text-lime"
-                      >
-                        {skill}
-                      </span>
-                    </li>
-                  ))}
+                  {group.skills.map((skill) => {
+                    const used = skillProjects.get(skill)?.length ?? 0;
+                    return (
+                      <li key={skill} className="group/skill">
+                        <span
+                          data-cursor
+                          className="inline-block cursor-default px-1 font-grotesk text-[clamp(1.2rem,2.8vw,2.4rem)] font-medium uppercase leading-tight tracking-[-0.02em] transition-colors duration-200 hover:bg-ink hover:text-lime"
+                        >
+                          {skill}
+                        </span>
+                        {used > 0 && (
+                          <span className="ml-1 hidden bg-ink px-1.5 py-0.5 align-middle font-mono text-[10px] uppercase tracking-[0.12em] text-lime group-hover/skill:inline-block">
+                            {used} {used === 1 ? "project" : "projects"}
+                          </span>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
                 </div>
               </motion.div>

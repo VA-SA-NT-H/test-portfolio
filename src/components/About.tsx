@@ -100,16 +100,31 @@ export function About() {
             </Reveal>
           </div>
 
-          {/* Fact column */}
+          {/* Fact column — rows arrive in sequence so the three facts
+              read one at a time: what's current, what was researched,
+              where the degree came from. */}
           <Reveal delay={0.1} className="lg:col-span-5">
-            <dl className="flex flex-col">
+            <motion.dl
+              variants={staggerGroup(0.14, 0.1)}
+              initial="hidden"
+              whileInView="show"
+              viewport={VIEWPORT}
+              className="flex flex-col"
+            >
               {FACTS.map(({ label, entry, link }) => (
-                <div
+                <motion.div
                   key={label}
+                  variants={staggerItem}
                   className="border-t border-paper/25 py-6 first:border-t-0 first:pt-0"
                 >
                   <dt className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.26em] text-lime">
-                    <span aria-hidden="true" className="inline-block h-2 w-2 bg-lime" />
+                    <span
+                      aria-hidden="true"
+                      className={`inline-block h-2 w-2 ${
+                        /* Blink = this record is ongoing; static = closed. */
+                        link ? "bg-lime node-live" : "bg-paper/45"
+                      }`}
+                    />
                     {label}
                   </dt>
                   <dd className="mt-3">
@@ -131,9 +146,9 @@ export function About() {
                       {entry.organization} · {entry.period}
                     </p>
                   </dd>
-                </div>
+                </motion.div>
               ))}
-            </dl>
+            </motion.dl>
           </Reveal>
         </div>
 

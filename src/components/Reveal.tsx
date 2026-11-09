@@ -7,6 +7,9 @@ interface RevealProps {
   children: ReactNode;
   delay?: number;
   className?: string;
+  /** Adds a backward tilt under perspective as the block rises —
+   *  used only for the framed blueprint panels in Work. */
+  depth?: boolean;
 }
 
 /**
@@ -20,7 +23,7 @@ interface RevealProps {
  * `focus-within` lifts the clip while a child has keyboard focus so
  * focus rings near the wrapper edges are never cut off.
  */
-export function Reveal({ children, delay = 0, className }: RevealProps) {
+export function Reveal({ children, delay = 0, className, depth = false }: RevealProps) {
   const reduced = usePrefersReducedMotion();
 
   if (reduced) {
@@ -37,6 +40,7 @@ export function Reveal({ children, delay = 0, className }: RevealProps) {
     <motion.div
       data-reveal="motion"
       className={classes}
+      style={depth ? { perspective: "1200px" } : undefined}
       variants={{ hidden: {}, show: {} }}
       initial="hidden"
       whileInView="show"
@@ -44,10 +48,11 @@ export function Reveal({ children, delay = 0, className }: RevealProps) {
     >
       <motion.div
         variants={{
-          hidden: { opacity: 0, y: "115%" },
+          hidden: { opacity: 0, y: "115%", rotateX: depth ? 9 : 0 },
           show: {
             opacity: 1,
             y: 0,
+            rotateX: 0,
             transition: { duration: DUR.base, ease: EASE_OUT, delay },
           },
         }}

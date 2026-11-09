@@ -34,7 +34,10 @@ export function SectionHead({ index, title, kicker, meta, headingId }: SectionHe
         <motion.span variants={cue(0)} className="flex items-center gap-3">
           <span aria-hidden="true" className="inline-block h-2.5 w-2.5 bg-current" />
           <span>
-            {index} / {kicker}
+            {/* The section number rolls out of its mask — the shared
+                "new chapter" beat, on top of the title rise and the
+                rule sweep below. Reduced motion renders it plain. */}
+            <MaskText text={index} stagger={0.05} /> / {kicker}
           </span>
         </motion.span>
         {meta && (

@@ -1,11 +1,14 @@
 import { motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 import { experience } from "../../data/experience";
-import { staggerGroup, staggerItem, VIEWPORT } from "../motion/presets";
+import { staggerGroup, staggerItem, DUR, EASE_OUT, VIEWPORT } from "../motion/presets";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import { Reveal } from "./Reveal";
 import { SectionHead } from "./SectionHead";
 import { Stat } from "./Stat";
+
+/** The measurement surface of the paper, kept as data — never prose. */
+const METRICS = ["Entropy", "NPCR", "UACI", "PSNR", "MSE", "MAE"];
 
 /**
  * The one acid-lime surface in the site: research presented the way a
@@ -102,12 +105,50 @@ export function Research() {
               ))}
             </motion.div>
 
-            <Reveal delay={0.16}>
-              <p className="mt-10 border-t-2 border-ink pt-5 font-mono text-[11px] uppercase leading-relaxed tracking-[0.16em] text-ink/75">
-                Evaluated on Entropy, NPCR, UACI, PSNR, MSE and MAE — E91+Chaos compared against
-                BB84+Chaos.
-              </p>
-            </Reveal>
+            {/* What was measured — each metric stamps in as its own
+                chip, so the evaluation surface is scannable at a glance
+                instead of buried in a sentence. */}
+            <div className="mt-10 border-t-2 border-ink pt-5">
+              <motion.p
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={VIEWPORT}
+                transition={{ duration: DUR.micro, ease: EASE_OUT }}
+                className="font-mono text-[10px] uppercase tracking-[0.24em] text-ink/70"
+              >
+                Evaluated on
+              </motion.p>
+              <motion.ul
+                variants={staggerGroup(0.06, 0.12)}
+                initial="hidden"
+                whileInView="show"
+                viewport={VIEWPORT}
+                className="mt-3 flex flex-wrap gap-2"
+              >
+                {METRICS.map((metric) => (
+                  <motion.li
+                    key={metric}
+                    variants={{
+                      hidden: { opacity: 0, scale: 0.82, rotate: -3 },
+                      show: {
+                        opacity: 1,
+                        scale: 1,
+                        rotate: 0,
+                        transition: { duration: DUR.base, ease: EASE_OUT },
+                      },
+                    }}
+                    className="border-2 border-ink px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.12em]"
+                  >
+                    {metric}
+                  </motion.li>
+                ))}
+              </motion.ul>
+              <Reveal delay={0.16}>
+                <p className="mt-4 font-mono text-[11px] uppercase leading-relaxed tracking-[0.16em] text-ink/75">
+                  E91+Chaos compared against BB84+Chaos.
+                </p>
+              </Reveal>
+            </div>
           </div>
         </div>
       </div>

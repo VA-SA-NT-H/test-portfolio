@@ -1,13 +1,23 @@
-import { motion, useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView, useScroll, useTransform } from "motion/react";
 import { portfolio } from "../../data/portfolio";
 import { GITHUB } from "../links";
 import { useMagnetic } from "../hooks/useMagnetic";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
-import { staggerGroup, staggerItem, VIEWPORT } from "../motion/presets";
+import { staggerGroup, staggerItem, DUR, EASE_OUT, VIEWPORT } from "../motion/presets";
 import { Marquee } from "./Marquee";
 import { Reveal } from "./Reveal";
 import { SectionHead } from "./SectionHead";
+
+/** Where a reply would actually come from — India Standard Time. */
+const IST = "Asia/Kolkata";
+const clockFormat = new Intl.DateTimeFormat("en-GB", {
+  timeZone: IST,
+  hour12: false,
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+});
 
 /** The invitation, word by word — accent words carry their own block. */
 const INVITE: { text: string; accent?: string; tail?: string }[] = [
@@ -33,6 +43,18 @@ export function Contact() {
     offset: ["start end", "end start"],
   });
   const wordmarkY = useTransform(scrollYProgress, [0, 1], [-36, 36]);
+
+  /* The clock under the email: ticks only while the section is on
+     screen, and freezes to the plain offset under reduced motion. */
+  const clockRef = useRef<HTMLParagraphElement>(null);
+  const clockVisible = useInView(clockRef);
+  const [clock, setClock] = useState(() => clockFormat.format(new Date()));
+
+  useEffect(() => {
+    if (!clockVisible || reduced) return;
+    const id = window.setInterval(() => setClock(clockFormat.format(new Date())), 1000);
+    return () => window.clearInterval(id);
+  }, [clockVisible, reduced]);
 
   return (
     <section
@@ -89,18 +111,44 @@ export function Contact() {
           </motion.a>
         </Reveal>
 
+        {/* Where a reply actually comes from: the ticking second is the
+            animation, the timezone is the information. */}
+        <motion.p
+          ref={clockRef}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={VIEWPORT}
+          transition={{ duration: DUR.base, ease: EASE_OUT, delay: 0.2 }}
+          className="mt-3 font-mono text-[11px] uppercase tracking-[0.18em] text-concrete"
+        >
+          {portfolio.location} · local time{" "}
+          <span className="tabular-nums text-lime">
+            {reduced ? "UTC+05:30 · IST" : clock}
+          </span>
+        </motion.p>
+
         {/* Channel ledger — rows arrive in sequence */}
         <motion.dl
           variants={staggerGroup(0.08, 0.1)}
           initial="hidden"
           whileInView="show"
           viewport={VIEWPORT}
-          className="mt-14 grid gap-px border-t-2 border-paper/40 sm:grid-cols-3"
+          className="mt-14 grid gap-px sm:grid-cols-3"
         >
+          {/* Each channel's top rule draws left → right in sequence,
+              so the ledger assembles as three opened channels. */}
           <motion.div
             variants={staggerItem}
-            className="border-b border-paper/20 py-6 sm:border-b-0 sm:border-r sm:border-paper/20 sm:pr-6"
+            className="relative border-b border-paper/20 py-6 sm:border-b-0 sm:border-r sm:border-paper/20 sm:pr-6"
           >
+            <motion.span
+              aria-hidden="true"
+              className="absolute inset-x-0 top-0 block h-0.5 origin-left bg-paper/40"
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={VIEWPORT}
+              transition={{ duration: DUR.wipe, ease: EASE_OUT, delay: 0.15 }}
+            />
             <dt className="font-mono text-[10px] uppercase tracking-[0.26em] text-concrete">
               Phone
             </dt>
@@ -116,8 +164,16 @@ export function Contact() {
 
           <motion.div
             variants={staggerItem}
-            className="border-b border-paper/20 py-6 sm:border-b-0 sm:border-r sm:border-paper/20 sm:px-6"
+            className="relative border-b border-paper/20 py-6 sm:border-b-0 sm:border-r sm:border-paper/20 sm:px-6"
           >
+            <motion.span
+              aria-hidden="true"
+              className="absolute inset-x-0 top-0 block h-0.5 origin-left bg-paper/40"
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={VIEWPORT}
+              transition={{ duration: DUR.wipe, ease: EASE_OUT, delay: 0.27 }}
+            />
             <dt className="font-mono text-[10px] uppercase tracking-[0.26em] text-concrete">
               Based in
             </dt>
@@ -126,7 +182,15 @@ export function Contact() {
             </dd>
           </motion.div>
 
-          <motion.div variants={staggerItem} className="py-6 sm:pl-6">
+          <motion.div variants={staggerItem} className="relative py-6 sm:pl-6">
+            <motion.span
+              aria-hidden="true"
+              className="absolute inset-x-0 top-0 block h-0.5 origin-left bg-paper/40"
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={VIEWPORT}
+              transition={{ duration: DUR.wipe, ease: EASE_OUT, delay: 0.39 }}
+            />
             <dt className="font-mono text-[10px] uppercase tracking-[0.26em] text-concrete">
               Code
             </dt>

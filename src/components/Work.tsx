@@ -85,7 +85,7 @@ export function Work() {
             className="mt-10 flex flex-col gap-6 md:gap-10"
           >
             {visible.map((project, index) => (
-              <Reveal key={project.id} delay={Math.min(index * 0.05, 0.2)}>
+              <Reveal key={project.id} delay={Math.min(index * 0.05, 0.2)} depth>
                 <ProjectStage project={project} onOpen={() => setOpenId(project.id)} />
               </Reveal>
             ))}
